@@ -1,1 +1,66 @@
-<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Manjeet Stock Analyzer V1</title><link rel='stylesheet' href='style.css'></head><body><main class='wrap'><header><div><h1>Manjeet Stock Analyzer <span>V1</span></h1><p>Technical trend analyzer • Educational use</p></div><div class='badge'>GitHub Ready</div></header><section class='controls card'><label>Stock<select id='stock'><option value='RELIANCE'>RELIANCE</option><option value='TCS'>TCS</option><option value='HDFCBANK'>HDFCBANK</option><option value='INFY'>INFY</option><option value='ICICIBANK'>ICICIBANK</option></select></label><label>Horizon<select id='horizon'><option>Intraday</option><option selected>Next Day</option><option>1 Week</option></select></label><button id='analyze'>Analyze Trend</button></section><section class='grid'><article class='card hero'><div class='muted'>Current demo price</div><div id='price' class='price'>₹2,941.30</div><div id='signal' class='signal bullish'>BULLISH</div><div class='prob'><div><span>Bullish</span><b id='bull'>68%</b></div><div class='bar'><i id='bar'></i></div><div><span>Bearish</span><b id='bear'>32%</b></div></div><p id='summary'>Trend, momentum and volume are aligned positively in this demo dataset.</p></article><article class='card'><h2>Market Score</h2><div class='score' id='score'>+36</div><small>-100 Bearish &nbsp; • &nbsp; 0 Neutral &nbsp; • &nbsp; +100 Bullish</small></article></section><section class='card'><h2>Technical Signals</h2><div id='signals' class='signals'></div></section><section class='card'><h2>Why this signal?</h2><ul id='reasons'></ul></section><section class='card'><h2>Mini Price Chart</h2><canvas id='chart' width='900' height='280'></canvas></section><footer>⚠️ Statistical/technical analysis only. It does not guarantee future price movement or constitute investment advice. V1 uses demo market data.</footer></main><script src='app.js'></script></body></html>
+<!doctype html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manjeet Stock Analyzer V3</title>
+<style>
+:root{--bg:#07101e;--card:#0d1b2d;--line:#20354e;--txt:#eef6ff;--mut:#91a5be;--g:#35d07f;--r:#ff6577;--y:#ffc857;--b:#59a8ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#06101d,#0a1730);color:var(--txt);font-family:system-ui,Arial}.w{max-width:1120px;margin:auto;padding:18px}
+h1{margin:0;font-size:clamp(24px,5vw,38px)}.sub,.mut{color:var(--mut)}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}.badge{border:1px solid var(--line);padding:7px 10px;border-radius:99px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}.c{background:rgba(13,27,45,.97);border:1px solid var(--line);border-radius:18px;padding:15px}.ctrl{grid-column:12 span}.sig{grid-column:5 span}.chart{grid-column:7 span}.full{grid-column:12 span}
+.row{display:flex;gap:9px;flex-wrap:wrap}.f{flex:1;min-width:160px}label{font-size:12px;color:var(--mut);display:block;margin-bottom:5px}input,select,button{width:100%;padding:12px;border-radius:11px;border:1px solid var(--line);background:#091728;color:var(--txt)}button{border:0;background:linear-gradient(135deg,#1677ff,#695cff);font-weight:800;cursor:pointer}
+.big{font-size:35px;font-weight:900;margin:8px 0}.g{color:var(--g)}.r{color:var(--r)}.y{color:var(--y)}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.m{background:#091728;border-radius:12px;padding:11px}.m b{display:block;font-size:17px;margin-top:4px}
+canvas{width:100%;height:270px;background:#091728;border-radius:12px}.why{line-height:1.65;margin-top:12px}.status{margin-top:9px;font-size:13px}.ok{color:var(--g)}.err{color:var(--r)}
+.bt{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px;font-size:13px}.note{font-size:12px;color:var(--mut);line-height:1.55;margin-top:12px}
+@media(max-width:760px){.sig,.chart{grid-column:12 span}.metrics{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}}
+</style></head><body><div class="w">
+<div class="top"><div><h1>📈 Manjeet Stock Analyzer <span style="color:var(--b)">V3</span></h1><div class="sub">Weekly + Monthly Swing Analysis • Real historical OHLCV</div></div><div class="badge">Twelve Data API</div></div>
+<div class="grid">
+<section class="c ctrl"><div class="row">
+<div class="f"><label>API Key</label><input id="key" type="password" placeholder="Twelve Data API key"></div>
+<div class="f"><label>NSE Symbol</label><input id="sym" value="RELIANCE" placeholder="RELIANCE / TCS / INFY"></div>
+<div class="f"><label>Analysis</label><select id="mode"><option value="week">1 Week (5–7 sessions)</option><option value="month">1 Month (20–25 sessions)</option></select></div>
+<div class="f" style="align-self:end"><button id="go">Analyze</button></div></div>
+<div id="status" class="status">Daily historical candles से swing signal बनेगा.</div></section>
+
+<section class="c sig"><div id="name" class="mut">Stock</div><div id="signal" class="big">—</div><div id="last" class="mut">Analyze करें</div>
+<div style="margin-top:12px">Signal Strength <b id="strength">—</b></div>
+<div id="why" class="why">Reasons यहाँ दिखेंगे.</div></section>
+
+<section class="c chart"><div class="mut" style="margin-bottom:8px">Recent daily closes</div><canvas id="cv" width="720" height="270"></canvas></section>
+
+<section class="c full"><div class="metrics">
+<div class="m"><span class="mut">RSI 14</span><b id="rsi">—</b></div><div class="m"><span class="mut">EMA 10</span><b id="e10">—</b></div>
+<div class="m"><span class="mut">EMA 20</span><b id="e20">—</b></div><div class="m"><span class="mut">EMA 50</span><b id="e50">—</b></div>
+<div class="m"><span class="mut">MACD Hist.</span><b id="macd">—</b></div><div class="m"><span class="mut">Volume / 20 Avg</span><b id="vol">—</b></div>
+<div class="m"><span class="mut">Support 20</span><b id="sup">—</b></div><div class="m"><span class="mut">Resistance 20</span><b id="res">—</b></div></div></section>
+
+<section class="c full bt"><b>Historical Backtest</b><div class="note">Same rule-set को पुराने candles पर लगाया जाता है. “Correct” का अर्थ: bullish signal के बाद horizon return positive या bearish के बाद negative था. Neutral signals accuracy में नहीं गिने जाते.</div>
+<table><thead><tr><th>Horizon</th><th>Tested Signals</th><th>Directional Hits</th><th>Hit Rate</th><th>Avg. Forward Return</th></tr></thead><tbody><tr><td id="bth">—</td><td id="btn">—</td><td id="bthits">—</td><td id="btrate">—</td><td id="btret">—</td></tr></tbody></table></section>
+</div><div class="note">Educational technical analysis only. Signal Strength is a rule score, not a guaranteed or calibrated probability of future price movement. News, results, market and sector context can change the outcome.</div>
+</div>
+<script>
+const $=x=>document.getElementById(x), F=n=>Number.isFinite(n)?n.toLocaleString('en-IN',{maximumFractionDigits:2}):'—';
+$('key').value=localStorage.getItem('msa_td_key')||'';
+function ema(a,p){if(a.length<p)return NaN;let e=a.slice(0,p).reduce((x,y)=>x+y,0)/p,k=2/(p+1);for(let i=p;i<a.length;i++)e=a[i]*k+e*(1-k);return e}
+function es(a,p){let o=[];if(a.length<p)return o;let e=a.slice(0,p).reduce((x,y)=>x+y,0)/p,k=2/(p+1);o[p-1]=e;for(let i=p;i<a.length;i++){e=a[i]*k+e*(1-k);o[i]=e}return o}
+function rsi(a,p=14){if(a.length<=p)return NaN;let g=0,l=0;for(let i=a.length-p;i<a.length;i++){let d=a[i]-a[i-1];d>0?g+=d:l-=d}return l===0?100:100-100/(1+(g/p)/(l/p))}
+function macd(a){let x=es(a,12),y=es(a,26),m=[];for(let i=25;i<a.length;i++)m.push(x[i]-y[i]);let line=m.at(-1),sg=ema(m,9);return line-sg}
+function score(rows,mode){let c=rows.map(x=>x.c),v=rows.map(x=>x.v),L=rows.at(-1),R=rsi(c),e10=ema(c,10),e20=ema(c,20),e50=ema(c,50),mh=macd(c),s=0,why=[];
+let momN=mode==='week'?5:20,mom=(L.c/c.at(-(momN+1))-1)*100;
+if(mode==='week'){if(L.c>e10){s+=15;why.push('✓ Price EMA10 के ऊपर')}else{s-=15;why.push('✗ Price EMA10 के नीचे')} if(e10>e20){s+=15;why.push('✓ EMA10 > EMA20')}else{s-=15;why.push('✗ EMA10 < EMA20')}}
+else{if(L.c>e20){s+=15;why.push('✓ Price EMA20 के ऊपर')}else{s-=15;why.push('✗ Price EMA20 के नीचे')} if(e20>e50){s+=18;why.push('✓ EMA20 > EMA50')}else{s-=18;why.push('✗ EMA20 < EMA50')}}
+if(R>=52&&R<=70){s+=15;why.push('✓ RSI positive momentum')}else if(R<45){s-=15;why.push('✗ RSI weak')}else if(R>75){s-=7;why.push('• RSI overbought')}else why.push('• RSI neutral');
+if(mh>0){s+=18;why.push('✓ MACD momentum positive')}else{s-=18;why.push('✗ MACD momentum negative')}
+if(mom>0){s+=20;why.push('✓ '+momN+'-session momentum +'+F(mom)+'%')}else{s-=20;why.push('✗ '+momN+'-session momentum '+F(mom)+'%')}
+let av=v.slice(-21,-1).reduce((a,b)=>a+b,0)/20,vr=av?L.v/av:1;if(vr>1.2){s+=mom>=0?10:-10;why.push('• Above-average volume')}
+s=Math.max(-100,Math.min(100,s));return {s,R,e10,e20,e50,mh,vr,why}}
+function draw(a){let c=$('cv'),x=c.getContext('2d'),w=c.width,h=c.height;x.clearRect(0,0,w,h);if(!a.length)return;let mn=Math.min(...a),mx=Math.max(...a),p=24,rg=mx-mn||1;x.strokeStyle='#59a8ff';x.lineWidth=3;x.beginPath();a.forEach((v,i)=>{let X=p+i*(w-2*p)/(a.length-1),Y=h-p-(v-mn)*(h-2*p)/rg;i?x.lineTo(X,Y):x.moveTo(X,Y)});x.stroke()}
+function backtest(rows,mode){let horizon=mode==='week'?5:20,start=80,n=0,hits=0,sum=0;for(let i=start;i<rows.length-horizon;i++){let q=score(rows.slice(0,i+1),mode),dir=q.s>=20?1:q.s<=-20?-1:0;if(!dir)continue;let ret=(rows[i+horizon].c/rows[i].c-1)*100;n++;sum+=ret;if((dir===1&&ret>0)||(dir===-1&&ret<0))hits++}return {n,hits,rate:n?hits/n*100:NaN,avg:n?sum/n:NaN,horizon}}
+async function load(key,sym){let u=new URL('https://api.twelvedata.com/time_series');u.searchParams.set('symbol',sym);u.searchParams.set('exchange','NSE');u.searchParams.set('interval','1day');u.searchParams.set('outputsize','500');u.searchParams.set('order','ASC');u.searchParams.set('adjust','all');u.searchParams.set('apikey',key);let r=await fetch(u),d=await r.json();if(!r.ok||d.status==='error'||!d.values)throw Error(d.message||'Data नहीं मिला');return d}
+$('go').onclick=async()=>{let key=$('key').value.trim(),sym=$('sym').value.trim().toUpperCase(),mode=$('mode').value;if(!key){$('status').textContent='API key डालें.';return}$('go').disabled=true;$('status').textContent='Real historical data analyze हो रहा है…';localStorage.setItem('msa_td_key',key);
+try{let d=await load(key,sym),rows=d.values.map(z=>({dt:z.datetime,o:+z.open,h:+z.high,l:+z.low,c:+z.close,v:+z.volume||0}));if(rows.length<100)throw Error('Backtest के लिए पर्याप्त daily history नहीं मिली.');
+let q=score(rows,mode),L=rows.at(-1),recent=rows.slice(-20),sup=Math.min(...recent.map(x=>x.l)),res=Math.max(...recent.map(x=>x.h)),label=q.s>=20?'🟢 BULLISH':q.s<=-20?'🔴 BEARISH':'🟡 NEUTRAL';
+$('signal').textContent=label;$('signal').className='big '+(q.s>=20?'g':q.s<=-20?'r':'y');$('strength').textContent=Math.abs(q.s)+'/100';$('name').textContent=(d.meta?.symbol||sym)+' • '+(mode==='week'?'1 Week':'1 Month');$('last').textContent='Last close ₹'+F(L.c)+' • '+L.dt;$('why').innerHTML=q.why.join('<br>');
+$('rsi').textContent=F(q.R);$('e10').textContent='₹'+F(q.e10);$('e20').textContent='₹'+F(q.e20);$('e50').textContent='₹'+F(q.e50);$('macd').textContent=F(q.mh);$('vol').textContent=F(q.vr)+'×';$('sup').textContent='₹'+F(sup);$('res').textContent='₹'+F(res);draw(rows.map(x=>x.c).slice(-90));
+let b=backtest(rows,mode);$('bth').textContent=b.horizon+' trading sessions';$('btn').textContent=b.n;$('bthits').textContent=b.hits;$('btrate').textContent=F(b.rate)+'%';$('btret').textContent=(b.avg>=0?'+':'')+F(b.avg)+'%';$('status').textContent='✓ Real daily data analyzed • '+L.dt;$('status').className='status ok'}
+catch(e){$('status').textContent='API/Data error: '+e.message;$('status').className='status err'}finally{$('go').disabled=false}};
+draw([]);
+</script></body></html>
