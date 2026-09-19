@@ -1,0 +1,1 @@
+{"name":"manjeet-stock-analyzer-v6","version":"1.0.0","private":true,"type":"module","engines":{"node":">=20"},"dependencies":{"nse-bse-api":"^0.1.3"}}

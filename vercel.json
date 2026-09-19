@@ -1,0 +1,1 @@
+{"functions":{"api/stock.js":{"maxDuration":30},"api/search.js":{"maxDuration":30},"api/options.js":{"maxDuration":30},"api/ipo.js":{"maxDuration":30},"api/status.js":{"maxDuration":30}}}
