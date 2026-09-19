@@ -1,0 +1,1 @@
+import {client} from "./_common.js";export default async function handler(req,res){let n=client();try{let data=await n.ipo.listCurrentIPO();res.setHeader("Cache-Control","s-maxage=1800");res.json({data})}catch(e){res.status(502).json({error:e?.message||"IPO fetch failed"})}finally{try{await n.exit()}catch{}}}

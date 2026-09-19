@@ -1,1 +1,1 @@
-
+import {client} from "./_common.js";export default async function handler(req,res){let n=client();try{let s=String(req.query.symbol||"NIFTY").toUpperCase();let data=await n.options.getOptionChain(s);res.setHeader("Cache-Control","s-maxage=60");res.json({data})}catch(e){res.status(502).json({error:e?.message||"Option chain failed"})}finally{try{await n.exit()}catch{}}}
