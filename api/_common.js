@@ -1,4 +1,4 @@
-import { NSE } from "nse-bse-api/nse";
+import { NSE } from "nse-bse-api";
 export function client(){return new NSE("/tmp/nse",{server:true,timeout:15000})}
 export function val(o,ks){for(const k of ks)if(o?.[k]!==undefined&&o?.[k]!==null&&o?.[k]!=="")return o[k]}
 export function num(x){return typeof x==="number"?x:Number(String(x??"").replace(/,/g,""))}
