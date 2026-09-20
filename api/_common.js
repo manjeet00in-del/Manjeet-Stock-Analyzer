@@ -1,10 +1,13 @@
 import { NSE } from "nse-bse-api";
 
 export function client() {
-  // Explicitly disable server mode on Vercel. In nse-bse-api, `server:true`
-  // expects the first constructor argument to be an HTTP server/base URL;
-  // our first argument is only a writable download directory.
-  return new NSE("/tmp/nse", { server: false, timeout: 15000 });
+  // nse-bse-api expects a URL-like server value internally. Passing the
+  // boolean false can be serialized into an invalid request target on some
+  // serverless runtimes. Use an explicit NSE origin instead.
+  return new NSE("/tmp/nse", {
+    server: "https://www.nseindia.com",
+    timeout: 15000
+  });
 }
 
 export function val(o, ks) {
