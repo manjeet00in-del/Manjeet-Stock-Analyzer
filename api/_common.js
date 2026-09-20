@@ -1,10 +1,10 @@
 import { NSE } from "nse-bse-api";
 
 export function client() {
-  // Vercel serverless runtime: let the library use its normal client mode.
-  // `server:true` makes the package expect a local server URL and causes
-  // URL parsing errors such as "The string did not match the expected pattern".
-  return new NSE("/tmp/nse", { timeout: 15000 });
+  // Explicitly disable server mode on Vercel. In nse-bse-api, `server:true`
+  // expects the first constructor argument to be an HTTP server/base URL;
+  // our first argument is only a writable download directory.
+  return new NSE("/tmp/nse", { server: false, timeout: 15000 });
 }
 
 export function val(o, ks) {
