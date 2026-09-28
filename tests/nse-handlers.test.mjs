@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import options from './api/options.js';
-import ipo from './api/ipo.js';
-import {cookiesFrom} from './api/_nse.js';
+import options from '../api/options.js';
+import ipo from '../api/ipo.js';
+import {cookiesFrom} from '../api/_nse.js';
 function response(body,status=200,cookies=[]){return {ok:status>=200&&status<300,status,headers:{getSetCookie:()=>cookies,get:()=>null},text:async()=>typeof body==='string'?body:JSON.stringify(body)}}
 function run(handler,query,fetcher){globalThis.fetch=fetcher;let out={headers:{},setHeader(k,v){this.headers[k]=v},status(n){this.statusCode=n;return this},json(x){this.body=x;return this}};return handler({query},out).then(()=>out)}
 const valid={records:{expiryDates:['30-Sep-2026'],data:[{expiryDate:'30-Sep-2026',strikePrice:25000,CE:{openInterest:10},PE:{openInterest:20}}]}};
