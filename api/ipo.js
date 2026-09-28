@@ -18,14 +18,14 @@ export default async function handler(req,res){
       try{
         const raw=await nseJSON(path,'/market-data/all-upcoming-issues-ipo',until);
         const rows=extract(raw);
-        if(!rows.length){validEmpty=true;continue}
+        if(!rows.length){validEmpty=true;lastError=null;continue}
         const data=rows.filter(x=>x&&typeof x==='object').map(norm).filter(x=>x.companyName);
         if(!data.length)throw new NSEError('BAD_SCHEMA','NSE IPO entries are unrecognized');
         res.setHeader('Cache-Control','s-maxage=600, stale-while-revalidate=1200');
         return res.status(200).json({source:'NSE India',updatedAt:new Date().toISOString(),count:data.length,data});
       }catch(e){lastError=e;if(e.code==='TIMEOUT')break}
     }
-    if(validEmpty){res.setHeader('Cache-Control','s-maxage=300');return res.status(200).json({source:'NSE India',updatedAt:new Date().toISOString(),count:0,data:[]})}
+    if(validEmpty&&!lastError){res.setHeader('Cache-Control','s-maxage=300');return res.status(200).json({source:'NSE India',updatedAt:new Date().toISOString(),count:0,data:[]})}
     throw lastError||new NSEError('UNAVAILABLE','Live IPO data unavailable');
   }catch(error){sendError(res,error,'Live IPO data unavailable')}
 }
